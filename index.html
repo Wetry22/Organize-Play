@@ -166,7 +166,6 @@
             outline: none !important;
         }
 
-        /* Animações Netflix */
         @keyframes netflixZoomIn {
             0% { opacity: 0; transform: scale(1.08); }
             100% { opacity: 1; transform: scale(1); }
@@ -208,7 +207,6 @@
             box-shadow: 0 20px 38px -12px var(--accent-soft);
         }
 
-        /* Bloqueador do botão de pop-out nativo do iframe do Google Drive */
         .drive-popout-shield {
             position: absolute;
             top: 0;
@@ -277,12 +275,13 @@
             <form onsubmit="confirmAccessCodeEntry(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1.5">Código de Acesso do Google Drive (API Key)</label>
-                    <input type="password" id="gateDriveAccessKeyInput" required placeholder="Cole o código de acesso (AIzaSy...)..." class="w-full px-4 py-3 rounded-xl text-xs font-mono bg-black/60 border border-white/15 text-white keep-white focus:border-red-500">
+                    <input type="password" id="gateDriveAccessKeyInput" required placeholder="Cole a API Key (AIzaSy...)..." class="w-full px-4 py-3 rounded-xl text-xs font-mono bg-black/60 border border-white/15 text-white keep-white focus:border-red-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Pasta Principal do Drive (Opcional se já salva)</label>
-                    <input type="text" id="gateDriveFolderInput" placeholder="Link ou ID da pasta do Drive..." class="w-full px-4 py-2.5 rounded-xl text-xs bg-black/60 border border-white/15 text-white keep-white">
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Link da Pasta Raiz no Google Drive</label>
+                    <input type="text" id="gateDriveFolderInput" required placeholder="https://drive.google.com/drive/folders/..." class="w-full px-4 py-2.5 rounded-xl text-xs bg-black/60 border border-white/15 text-white keep-white">
+                    <p class="text-[10px] text-slate-400 mt-1">Dica: Deixe a pasta compartilhada como "Qualquer pessoa com o link pode ver".</p>
                 </div>
 
                 <div id="gateLoadingStatus" class="hidden p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-xs text-red-300 flex items-center gap-2">
@@ -295,7 +294,7 @@
                         Voltar
                     </button>
                     <button type="submit" id="btnGateEnter" class="flex-1 py-2.5 px-5 rounded-xl bg-[#e50914] hover:bg-[#f6121d] text-white keep-white text-xs font-bold shadow-lg shadow-red-600/25 flex items-center justify-center gap-2 transition">
-                        <i data-lucide="unlock" class="w-4 h-4"></i> Entrar na Plataforma
+                        <i data-lucide="unlock" class="w-4 h-4"></i> Conectar & Entrar
                     </button>
                 </div>
             </form>
@@ -561,11 +560,11 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
 
     <!-- =========================================================================
-         JAVASCRIPT (VARREDURA RECURSIVA ILIMITADA DE PASTAS E SUBPASTAS)
+         JAVASCRIPT (VARREDURA ROBUSTA COM TRATAMENTO DE PERMISSÃO)
          ========================================================================= -->
     <script>
-        const COURSES_STORAGE_KEY = 'ORGANIZE_PLAY_SHARED_CATALOG_V3';
-        const SAVED_ROOT_FOLDERS_KEY = 'ORGANIZE_PLAY_SAVED_ROOT_FOLDERS_V3';
+        const COURSES_STORAGE_KEY = 'ORGANIZE_PLAY_SHARED_CATALOG_V4';
+        const SAVED_ROOT_FOLDERS_KEY = 'ORGANIZE_PLAY_SAVED_ROOT_FOLDERS_V4';
         const PROGRESS_STORAGE_PREFIX = 'ORGANIZE_PLAY_PROGRESS_USER_';
         const DRIVE_CREDS_KEY = 'ORGANIZE_GDRIVE_CREDS_V2';
         const THEME_KEY = 'ORGANIZE_PLAY_THEME_V2';
@@ -622,7 +621,11 @@
             const savedCreds = getDriveCreds();
             const savedFolders = getSavedRootFolders();
             document.getElementById('gateDriveAccessKeyInput').value = savedCreds.apiKey || '';
-            document.getElementById('gateDriveFolderInput').value = '';
+            if (savedFolders.length > 0) {
+                document.getElementById('gateDriveFolderInput').value = `https://drive.google.com/drive/folders/${savedFolders[0].folderId}`;
+            } else {
+                document.getElementById('gateDriveFolderInput').value = '';
+            }
 
             openModal('modalAccessCodeGate');
             setTimeout(() => {
@@ -640,10 +643,10 @@
             if (!currentProfile) return;
 
             const accessKey = document.getElementById('gateDriveAccessKeyInput').value.trim();
-            const optionalFolder = document.getElementById('gateDriveFolderInput').value.trim();
+            const folderInputUrl = document.getElementById('gateDriveFolderInput').value.trim();
 
             if (!accessKey) {
-                showToast('Insira o código de acesso do Google Drive.');
+                showToast('Insira o código de acesso (API Key).');
                 return;
             }
 
@@ -655,52 +658,40 @@
             const loadingTxt = document.getElementById('gateLoadingText');
             const btnEl = document.getElementById('btnGateEnter');
 
-            // Se o usuário colou uma pasta nova no login OU se o catálogo estiver vazio mas houver pastas salvas
-            const savedFolders = getSavedRootFolders();
-            if (optionalFolder) {
-                statusEl.classList.remove('hidden');
-                btnEl.disabled = true;
-                try {
-                    const fId = extractDriveId(optionalFolder);
-                    await scanAndSaveFolderStructure(fId, '', 'AUTO', (msg) => {
-                        if (loadingTxt) loadingTxt.textContent = msg;
-                    });
-                } catch (err) {
-                    showToast('Erro ao ler pasta: verifique a API Key e se a pasta está pública.');
-                } finally {
-                    statusEl.classList.add('hidden');
-                    btnEl.disabled = false;
-                }
-            } else if (coursesState.length === 0 && savedFolders.length > 0) {
-                statusEl.classList.remove('hidden');
-                btnEl.disabled = true;
-                try {
-                    for (const sf of savedFolders) {
-                        await scanAndSaveFolderStructure(sf.folderId, sf.customTitle || '', sf.mode || 'AUTO', (msg) => {
-                            if (loadingTxt) loadingTxt.textContent = msg;
-                        });
-                    }
-                } catch (err) {
-                    console.warn(err);
-                } finally {
-                    statusEl.classList.add('hidden');
-                    btnEl.disabled = false;
-                }
+            const folderId = extractDriveId(folderInputUrl);
+            if (!folderId) {
+                showToast('Link ou ID da pasta inválido.');
+                return;
             }
 
-            const headerAvatar = document.getElementById('headerProfileAvatar');
-            headerAvatar.className = `w-7 h-7 rounded-lg bg-gradient-to-br ${currentProfile.gradient} flex items-center justify-center text-white keep-white font-bold text-xs`;
-            headerAvatar.textContent = currentProfile.initial;
+            statusEl.classList.remove('hidden');
+            btnEl.disabled = true;
 
-            document.getElementById('headerProfileName').textContent = currentProfile.name;
-            document.getElementById('heroProfileName').textContent = currentProfile.name;
-            document.getElementById('notesOwnerLabel').textContent = currentProfile.name;
+            try {
+                await scanAndSaveFolderStructure(folderId, '', 'AUTO', (msg) => {
+                    if (loadingTxt) loadingTxt.textContent = msg;
+                });
 
-            closeModal('modalAccessCodeGate');
-            document.getElementById('screenProfiles').classList.add('hidden');
+                const headerAvatar = document.getElementById('headerProfileAvatar');
+                headerAvatar.className = `w-7 h-7 rounded-lg bg-gradient-to-br ${currentProfile.gradient} flex items-center justify-center text-white keep-white font-bold text-xs`;
+                headerAvatar.textContent = currentProfile.initial;
 
-            renderCatalog();
-            showToast(`Bem-vindo(a), ${currentProfile.name}!`);
+                document.getElementById('headerProfileName').textContent = currentProfile.name;
+                document.getElementById('heroProfileName').textContent = currentProfile.name;
+                document.getElementById('notesOwnerLabel').textContent = currentProfile.name;
+
+                closeModal('modalAccessCodeGate');
+                document.getElementById('screenProfiles').classList.add('hidden');
+
+                renderCatalog();
+                showToast(`Bem-vindo(a), ${currentProfile.name}!`);
+            } catch (err) {
+                console.error(err);
+                showToast(`Erro ao carregar pasta: ${err.message || 'Verifique a API Key e se a pasta é pública'}`);
+            } finally {
+                statusEl.classList.add('hidden');
+                btnEl.disabled = false;
+            }
         }
 
         function switchProfileScreen() {
@@ -764,7 +755,7 @@
 
         function loadCoursesState() {
             try {
-                const raw = localStorage.getItem(COURSES_STORAGE_KEY) || localStorage.getItem('ORGANIZE_PLAY_SHARED_CATALOG_V2');
+                const raw = localStorage.getItem(COURSES_STORAGE_KEY) || localStorage.getItem('ORGANIZE_PLAY_SHARED_CATALOG_V3');
                 coursesState = raw ? JSON.parse(raw) : [];
             } catch (e) {
                 coursesState = [];
@@ -1079,7 +1070,6 @@
             renderLessonVideoPlayer(les);
             renderLessonPdfList(les);
 
-            // Se a aula for apenas PDF (sem vídeo) ou se o leitor já estiver aberto, abre o PDF automaticamente
             if ((!les.videoDriveId && les.pdfs && les.pdfs.length > 0) || (isPdfSplitOpen && les.pdfs && les.pdfs.length > 0)) {
                 openPdfInViewer(les.pdfs[0].id);
             }
@@ -1236,7 +1226,7 @@
         }
 
         // =========================================================================
-        // VARREDURA RECURSIVA ILIMITADA DE PASTAS, SUBPASTAS, ATALHOS E VÍDEOS
+        // VARREDURA RECURSIVA ROBUSTA DO GOOGLE DRIVE
         // =========================================================================
         function getDriveCreds() {
             try {
@@ -1255,11 +1245,10 @@
             showToast('Código de acesso atualizado!');
         }
 
-        // Busca TODOS os itens de uma pasta (com suporte a paginação nextPageToken e atalhos do Drive)
         async function fetchDriveFilesInFolder(folderId) {
             const creds = getDriveCreds();
             if (!creds.apiKey) {
-                throw new Error('Código de Acesso (API Key) não configurado.');
+                throw new Error('Código de Acesso (API Key) não configurado. Clique no ícone de chave.');
             }
 
             let allFiles = [];
@@ -1279,6 +1268,9 @@
                         const errJson = await res.json();
                         errMsg = errJson.error?.message || errMsg;
                     } catch (_) {}
+                    if (res.status === 403 || res.status === 404) {
+                        throw new Error('Pasta não encontrada ou sem permissão pública. Verifique se a pasta no Google Drive está compartilhada como "Qualquer pessoa com o link".');
+                    }
                     throw new Error(errMsg);
                 }
                 const data = await res.json();
@@ -1288,7 +1280,6 @@
                 pageToken = data.nextPageToken || '';
             } while (pageToken);
 
-            // Resolve atalhos de pastas ou vídeos do Google Drive automaticamente
             return allFiles.map(item => {
                 if (item.mimeType === 'application/vnd.google-apps.shortcut' && item.shortcutDetails) {
                     return {
@@ -1380,7 +1371,6 @@
             return lessons;
         }
 
-        // Varre recursivamente TODAS as subpastas (N níveis de profundidade: Pasta > Subpasta > Sub-subpasta > Vídeos)
         async function collectModulesRecursively(folderId, breadcrumbTitle, onProgress, depth = 0, visited = new Set()) {
             if (depth > 8 || visited.has(folderId)) return [];
             visited.add(folderId);
@@ -1433,8 +1423,6 @@
 
             let importedCoursesCount = 0;
 
-            // Se a pasta raiz só contém outras pastas de cursos (ou o usuário escolheu MULTI_COURSES),
-            // verifica se cada subpasta principal tem subpastas/vídeos próprios
             if (mode === 'MULTI_COURSES' && topSubfolders.length > 0) {
                 for (const sub of topSubfolders) {
                     const subModules = await collectModulesRecursively(sub.id, '', onProgress);
@@ -1458,7 +1446,6 @@
                     importedCoursesCount++;
                 }
             } else {
-                // Varre absolutamente TUDO dentro da pasta e todas as subpastas (qualquer profundidade)
                 let allModules = [];
                 if (topDirectLessons.length > 0) {
                     allModules.push({
