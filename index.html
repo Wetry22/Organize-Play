@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Organize Play | Plataforma de Cursos & Aulas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+    <!-- Google Identity Services & GAPI -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        play: {
+                            bg: 'var(--bg-main)',
+                            surface: 'var(--bg-surface)',
+                            card: 'var(--bg-card)',
+                            border: 'var(--border-primary)',
+                            subtle: 'var(--border-subtle)',
+                            accent: 'var(--accent-main)',
+                            accentHover: 'var(--accent-hover)',
+                            accentText: 'var(--accent-text)',
+                            accentSoft: 'var(--accent-soft)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 1. ESCURO TÁTICO (PADRÃO) */
+        :root, [data-theme="dark"] {
+            --bg-main: #070a10;
+            --bg-surface: #0f1520;
+            --bg-card: #161f30;
+            --border-primary: rgba(148, 163, 184, 0.16);
+            --border-subtle: rgba(148, 163, 184, 0.09);
+            --border-input: #2d3d56;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-main: #0b61f5;
+            --accent-hover: #2574f7;
+            --accent-soft: rgba(11, 97, 245, 0.16);
+            --accent-text: #60a5fa;
+        }
+
+        /* 2. ROSA BEBÊ */
+        [data-theme="pink"] {
+            --bg-main: #fff5f8;
+            --bg-surface: #ffffff;
+            --bg-card: #ffe4ed;
+            --border-primary: #fbcfe8;
+            --border-subtle: #fce7f3;
+            --border-input: #f9a8d4;
+            --text-main: #831843;
+            --text-muted: #be185d;
+            --accent-main: #ec4899;
+            --accent-hover: #db2777;
+            --accent-soft: rgba(236, 72, 153, 0.16);
+            --accent-text: #be185d;
+        }
+
+        /* 3. AZUL BEBÊ */
+        [data-theme="blue"] {
+            --bg-main: #f0f8ff;
+            --bg-surface: #ffffff;
+            --bg-card: #e0f2fe;
+            --border-primary: #bae6fd;
+            --border-subtle: #e0f2fe;
+            --border-input: #7dd3fc;
+            --text-main: #075985;
+            --text-muted: #0284c7;
+            --accent-main: #0284c7;
+            --accent-hover: #0369a1;
+            --accent-soft: rgba(2, 132, 199, 0.16);
+            --accent-text: #0369a1;
+        }
+
+        /* 4. VERDE MILITAR */
+        [data-theme="military"] {
+            --bg-main: #070a06;
+            --bg-surface: #0f140d;
+            --bg-card: #161f14;
+            --border-primary: rgba(101, 133, 76, 0.28);
+            --border-subtle: rgba(101, 133, 76, 0.15);
+            --border-input: #364929;
+            --text-main: #ecfccb;
+            --text-muted: #849a73;
+            --accent-main: #4d7c0f;
+            --accent-hover: #65a30d;
+            --accent-soft: rgba(77, 124, 15, 0.22);
+            --accent-text: #84cc16;
+        }
+
+        /* 5. FLAMENGO */
+        [data-theme="flamengo"] {
+            --bg-main: #0a0607;
+            --bg-surface: #130b0d;
+            --bg-card: #1c1013;
+            --border-primary: rgba(225, 29, 72, 0.25);
+            --border-subtle: rgba(225, 29, 72, 0.12);
+            --border-input: #4c1117;
+            --text-main: #fff1f2;
+            --text-muted: #a17178;
+            --accent-main: #c91424;
+            --accent-hover: #e11d48;
+            --accent-soft: rgba(201, 20, 36, 0.20);
+            --accent-text: #ff4d5e;
+        }
+
+        *, ::before, ::after {
+            border-color: var(--border-primary);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* Contraste automático para Temas Claros */
+        [data-theme="pink"] .text-white:not(.keep-white),
+        [data-theme="pink"] .text-slate-100,
+        [data-theme="pink"] .text-slate-200,
+        [data-theme="pink"] .text-slate-300 {
+            color: #831843 !important;
+        }
+        [data-theme="pink"] .text-slate-400,
+        [data-theme="pink"] .text-slate-500 {
+            color: #be185d !important;
+        }
+
+        [data-theme="blue"] .text-white:not(.keep-white),
+        [data-theme="blue"] .text-slate-100,
+        [data-theme="blue"] .text-slate-200,
+        [data-theme="blue"] .text-slate-300 {
+            color: #075985 !important;
+        }
+        [data-theme="blue"] .text-slate-400,
+        [data-theme="blue"] .text-slate-500 {
+            color: #0284c7 !important;
+        }
+
+        .theme-accent-bg { background-color: var(--accent-main) !important; color: #ffffff !important; }
+        .theme-accent-text { color: var(--accent-text) !important; }
+        .theme-accent-soft { background-color: var(--accent-soft) !important; color: var(--accent-text) !important; }
+
+        input:not([type="checkbox"]):not([type="file"]), select, textarea {
+            border: 1px solid var(--border-input) !important;
+            background-color: var(--bg-main) !important;
+            color: var(--text-main) !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-main) !important;
+            box-shadow: 0 0 0 3px var(--accent-soft) !important;
+            outline: none !important;
+        }
+
+        @keyframes progressShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .progress-shimmer {
+            background: linear-gradient(90deg, var(--accent-main) 0%, var(--accent-hover) 45%, #ffffff 50%, var(--accent-hover) 55%, var(--accent-main) 100%);
+            background-size: 200% 100%;
+            animation: progressShimmer 3.5s infinite linear;
+        }
+
+        .course-card {
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-main);
+            box-shadow: 0 16px 32px -12px var(--accent-soft);
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 9999px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-play-bg selection:bg-play-accent selection:text-white">
+
+    <!-- TOP NAVBAR -->
+    <header class="sticky top-0 z-40 bg-play-surface/90 backdrop-blur-md border-b border-play-border px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div onclick="showCatalogView()" class="flex items-center gap-3 cursor-pointer group">
+                <div class="w-10 h-10 rounded-xl bg-play-accent flex items-center justify-center shadow-lg border border-white/20 group-hover:scale-105 transition">
+                    <i data-lucide="play-circle" class="w-5 h-5 text-white keep-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-wide text-white leading-none">Organize <span class="theme-accent-text">Play</span></h1>
+                    <span class="text-[10px] font-mono text-slate-400 tracking-wider uppercase">Sala de Aulas & Drive</span>
+                </div>
+            </div>
+
+            <!-- Breadcrumb quando dentro de um curso -->
+            <div id="topCourseBreadcrumb" class="hidden md:flex items-center gap-2 pl-4 ml-2 border-l border-play-border text-xs">
+                <button onclick="showCatalogView()" class="text-slate-400 hover:text-white flex items-center gap-1 transition">
+                    <i data-lucide="grid" class="w-3.5 h-3.5"></i> Meus Cursos
+                </button>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span id="breadcrumbCourseTitle" class="font-bold theme-accent-text truncate max-w-[260px]">Nome do Curso</span>
+            </div>
+        </div>
+
+        <!-- Global Progress & Controls -->
+        <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+            <!-- Status Google Drive -->
+            <div class="flex items-center gap-1.5 bg-play-bg border border-play-border px-3 py-1.5 rounded-xl">
+                <i data-lucide="hard-drive" class="w-4 h-4 theme-accent-text"></i>
+                <span id="driveStatusBadge" class="text-[11px] font-mono text-slate-300 hidden sm:inline">Drive Desconectado</span>
+                <button onclick="handleDriveAuth()" id="btnDriveConnect" class="px-2.5 py-1 rounded-lg theme-accent-soft text-[11px] font-mono font-bold transition">
+                    Conectar Drive
+                </button>
+                <button onclick="openModal('modalDriveConfig')" title="Configurar Credenciais da API do Google Drive" class="p-1 text-slate-400 hover:text-white transition">
+                    <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <!-- Botão Escanear Pasta do Drive -->
+            <button onclick="openModal('modalImportDriveFolder')" class="px-3.5 py-2 rounded-xl bg-play-accent hover:bg-play-accentHover text-white keep-white text-xs font-semibold flex items-center gap-1.5 shadow-md transition">
+                <i data-lucide="folder-sync" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Importar Pasta do Drive</span>
+            </button>
+
+            <!-- Seletor de Temas -->
+            <select id="themeSelector" onchange="applyTheme(this.value)" class="px-2.5 py-2 rounded-xl bg-play-card border border-play-border text-xs font-semibold text-white cursor-pointer">
+                <option value="dark">🌑 Escuro Tático</option>
+                <option value="pink">🌸 Rosa Bebê</option>
+                <option value="blue">💎 Azul Bebê</option>
+                <option value="military">🪖 Verde Militar</option>
+                <option value="flamengo">🔴⚫ Flamengo</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- =========================================================================
+         VIEW 1: CATÁLOGO DE CURSOS & DASHBOARD DE AULAS
+         ========================================================================= -->
+    <main id="viewCatalog" class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto space-y-6">
+
+        <!-- Banner Resumo Geral -->
+        <div class="bg-play-surface border border-play-border rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-sm">
+            <div class="space-y-1.5">
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full theme-accent-soft text-[11px] font-mono font-bold uppercase">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Streaming Direto do seu Google Drive
+                </div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-white">Meus Cursos & Videoaulas</h2>
+                <p class="text-xs sm:text-sm text-slate-400 max-w-2xl">
+                    Importe automaticamente qualquer pasta de curso do seu Google Drive ou adicione aulas e apostilas PDF manualmente. Acompanhe seu progresso aula por aula.
+                </p>
+            </div>
+
+            <!-- KPIs Rápidos -->
+            <div class="grid grid-cols-3 gap-3 shrink-0">
+                <div class="p-3.5 rounded-xl bg-play-bg border border-play-border text-center min-w-[100px]">
+                    <div class="text-[10px] font-mono uppercase text-slate-400">Cursos</div>
+                    <div id="kpiTotalCourses" class="text-xl font-mono font-extrabold text-white mt-0.5">0</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-play-bg border border-play-border text-center min-w-[100px]">
+                    <div class="text-[10px] font-mono uppercase text-slate-400">Aulas Vistas</div>
+                    <div id="kpiCompletedLessons" class="text-xl font-mono font-extrabold theme-accent-text mt-0.5">0/0</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-play-bg border border-play-border text-center min-w-[100px]">
+                    <div class="text-[10px] font-mono uppercase text-slate-400">Progresso</div>
+                    <div id="kpiGlobalPct" class="text-xl font-mono font-extrabold text-white mt-0.5">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Busca e Ações -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-play-surface border border-play-border rounded-2xl p-4">
+            <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="catalogSearchInput" oninput="renderCatalog()" placeholder="Buscar curso, disciplina ou aula..." class="w-full pl-10 pr-4 py-2 rounded-xl text-sm">
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openModal('modalCreateCourse')" class="px-4 py-2 rounded-xl bg-play-accent hover:bg-play-accentHover text-white keep-white text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Criar Curso Manual
+                </button>
+                <button onclick="exportCoursesBackup()" class="px-3.5 py-2 rounded-xl bg-play-card hover:bg-play-surface border border-play-border text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition">
+                    <i data-lucide="download" class="w-3.5 h-3.5 theme-accent-text"></i> Exportar JSON
+                </button>
+                <button onclick="document.getElementById('importCoursesInput').click()" class="px-3.5 py-2 rounded-xl bg-play-card hover:bg-play-surface border border-play-border text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition">
+                    <i data-lucide="upload" class="w-3.5 h-3.5 theme-accent-text"></i> Importar JSON
+                </button>
+                <input type="file" id="importCoursesInput" accept=".json" class="hidden" onchange="importCoursesBackup(event)">
+            </div>
+        </div>
+
+        <!-- Grid de Cursos -->
+        <div id="coursesGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </main>
+
+    <!-- =========================================================================
+         VIEW 2: SALA DE AULA (PLAYER DE VÍDEO + LEITOR PDF + PLAYLIST DE MÓDULOS)
+         ========================================================================= -->
+    <main id="viewPlayer" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+        <!-- COLUNA ESQUERDA/CENTRAL: PLAYER DE VÍDEO + PDF SPLIT + NOTAS -->
+        <div class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 space-y-5">
+
+            <!-- Barra de Topo da Aula -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-play-surface border border-play-border rounded-2xl p-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="showCatalogView()" title="Voltar aos Cursos" class="p-2 rounded-xl bg-play-card hover:bg-play-bg border border-play-border text-slate-300 hover:text-white transition shrink-0">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    </button>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span id="playerModuleBadge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded theme-accent-soft font-bold">Módulo</span>
+                            <span id="playerLessonStatusBadge" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-play-card text-slate-400">Não vista</span>
+                        </div>
+                        <h2 id="playerLessonTitle" class="text-base sm:text-lg font-extrabold text-white truncate mt-0.5">Selecione uma aula</h2>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação da Aula: Check, Modo Dividido PDF e Próxima -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="toggleSplitPdfView()" id="btnToggleSplitPdf" class="px-3.5 py-2 rounded-xl bg-play-card hover:bg-play-bg border border-play-border text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition">
+                        <i data-lucide="columns" class="w-4 h-4 theme-accent-text"></i>
+                        <span>Abrir PDF ao Lado</span>
+                    </button>
+
+                    <button onclick="toggleCurrentLessonWatched()" id="btnCheckLesson" class="px-4 py-2 rounded-xl bg-play-card border border-play-border text-xs font-bold text-white flex items-center gap-2 transition">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>Marcar como Vista</span>
+                    </button>
+
+                    <button onclick="playNextLesson()" class="px-3.5 py-2 rounded-xl bg-play-accent hover:bg-play-accentHover text-white keep-white text-xs font-semibold flex items-center gap-1 transition">
+                        <span>Próxima</span>
+                        <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ÁREA PRINCIPAL DE REPRODUÇÃO (VÍDEO + PDF SPLIT SCREEN OPCIONAL) -->
+            <div id="mediaWorkspaceGrid" class="grid grid-cols-1 gap-5">
+
+                <!-- CONTAINER DO PLAYER DE VÍDEO -->
+                <div class="bg-play-surface border border-play-border rounded-2xl overflow-hidden shadow-xl flex flex-col">
+                    <div class="p-3 bg-play-card/60 border-b border-play-border flex items-center justify-between text-xs">
+                        <span class="font-mono font-bold text-slate-300 flex items-center gap-1.5">
+                            <i data-lucide="video" class="w-4 h-4 theme-accent-text"></i> Reprodutor de Videoaula
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="switchVideoRenderMode('EMBED')" id="btnVideoModeEmbed" class="px-2.5 py-1 rounded-lg text-[11px] font-mono theme-accent-bg">Player Drive (Iframe)</button>
+                            <button onclick="switchVideoRenderMode('NATIVE')" id="btnVideoModeNative" class="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-play-bg text-slate-300">Player HTML5 Direto</button>
+                            <a id="externalVideoDriveLink" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-play-bg hover:bg-play-card text-[11px] font-mono theme-accent-text flex items-center gap-1">
+                                <i data-lucide="external-link" class="w-3 h-3"></i> Abrir no Drive
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Caixa 16:9 do Vídeo -->
+                    <div class="relative w-full aspect-video bg-black flex items-center justify-center">
+                        <!-- Iframe do Google Drive / YouTube -->
+                        <iframe id="lessonVideoIframe" class="w-full h-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+
+                        <!-- Player HTML5 Nativo (quando conectado via Token OAuth ou link direto) -->
+                        <video id="lessonVideoNative" controls controlsList="nodownload" class="w-full h-full hidden bg-black"></video>
+
+                        <!-- Placeholder quando não há vídeo -->
+                        <div id="lessonVideoEmptyState" class="hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-play-bg/95">
+                            <i data-lucide="film" class="w-12 h-12 theme-accent-text mb-3 opacity-80"></i>
+                            <h4 class="text-sm font-bold text-white">Nenhum vídeo vinculado a esta aula</h4>
+                            <p class="text-xs text-slate-400 max-w-md mt-1">Você pode estudar pelos PDFs anexos abaixo ou clicar em "Editar Aula" na barra lateral para colar o link do vídeo do Google Drive.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTAINER DO VISUALIZADOR DE PDF EMBUTIDO (Aparece quando acionado) -->
+                <div id="pdfViewerPanel" class="hidden bg-play-surface border border-play-border rounded-2xl overflow-hidden shadow-xl flex flex-col h-[600px] lg:h-auto">
+                    <div class="p-3 bg-play-card/60 border-b border-play-border flex items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <i data-lucide="file-text" class="w-4 h-4 theme-accent-text shrink-0"></i>
+                            <span id="activePdfTitle" class="font-bold text-white truncate">Material de Apoio.pdf</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <a id="activePdfExternalBtn" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-play-bg text-[11px] font-mono theme-accent-text flex items-center gap-1">
+                                <i data-lucide="external-link" class="w-3 h-3"></i> Nova Aba / Baixar
+                            </a>
+                            <button onclick="closePdfViewer()" class="p-1 rounded-lg bg-play-bg text-slate-400 hover:text-white">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <iframe id="pdfPreviewIframe" class="w-full flex-1 min-h-[520px] bg-white border-0"></iframe>
+                </div>
+
+            </div>
+
+            <!-- PAINEL INFERIOR: ANEXOS EM PDF DA AULA & ANOTAÇÕES DO ALUNO -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+                <!-- Lista de PDFs / Apostilas da Aula -->
+                <div class="lg:col-span-5 bg-play-surface border border-play-border rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-play-border pb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i data-lucide="paperclip" class="w-4 h-4 theme-accent-text"></i>
+                            Anexos & PDFs da Aula
+                        </h3>
+                        <button onclick="openModal('modalAddPdfAttachment')" class="px-2.5 py-1 rounded-lg theme-accent-soft text-xs font-semibold flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Anexar PDF
+                        </button>
+                    </div>
+                    <div id="lessonPdfAttachmentsList" class="space-y-2"></div>
+                </div>
+
+                <!-- Caderno de Anotações da Aula -->
+                <div class="lg:col-span-7 bg-play-surface border border-play-border rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-play-border pb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i data-lucide="notebook-pen" class="w-4 h-4 theme-accent-text"></i>
+                            Minhas Anotações desta Aula
+                        </h3>
+                        <span id="notesSavedIndicator" class="text-[11px] font-mono text-slate-400">Salvo automaticamente</span>
+                    </div>
+                    <textarea id="lessonNotesTextarea" oninput="saveCurrentLessonNotes(this.value)" rows="4" placeholder="Anote os pontos importantes, minutagem do vídeo ou artigos citados pelo professor..." class="w-full p-3.5 rounded-xl text-xs sm:text-sm leading-relaxed"></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- COLUNA DIREITA: PLAYLIST DE MÓDULOS E AULAS COM CHECKBOX -->
+        <aside class="w-full lg:w-96 bg-play-surface border-t lg:border-t-0 lg:border-l border-play-border flex flex-col h-[500px] lg:h-[calc(100vh-65px)] shrink-0">
+            <!-- Cabeçalho da Playlist do Curso -->
+            <div class="p-4 border-b border-play-border bg-play-card/40 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <h3 id="playlistCourseTitle" class="text-sm font-extrabold text-white truncate">Conteúdo do Curso</h3>
+                    <button onclick="openModal('modalAddLesson')" class="px-2.5 py-1 rounded-lg bg-play-accent text-white keep-white text-[11px] font-semibold flex items-center gap-1 shrink-0">
+                        <i data-lucide="plus" class="w-3 h-3"></i> Nova Aula
+                    </button>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between text-xs font-mono mb-1">
+                        <span id="playlistProgressCount" class="text-slate-400">0/0 aulas vistas</span>
+                        <span id="playlistProgressPct" class="theme-accent-text font-bold">0%</span>
+                    </div>
+                    <div class="w-full h-2 bg-play-bg rounded-full overflow-hidden p-0.5 border border-play-subtle">
+                        <div id="playlistProgressBar" class="h-full rounded-full progress-shimmer transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Módulos e Aulas -->
+            <div id="playlistModulesContainer" class="flex-1 overflow-y-auto p-3 space-y-3"></div>
+        </aside>
+
+    </main>
+
+    <!-- =========================================================================
+         MODAIS
+         ========================================================================= -->
+
+    <!-- MODAL 1: IMPORTAR PASTA DE CURSO DIRETO DO GOOGLE DRIVE -->
+    <div id="modalImportDriveFolder" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-play-surface border border-play-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-play-border pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="folder-sync" class="w-5 h-5 theme-accent-text"></i>
+                    Importar Curso de Pasta do Google Drive
+                </h3>
+                <button onclick="closeModal('modalImportDriveFolder')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-play-bg border border-play-border text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p><strong>Como funciona:</strong> Cole o link ou ID de qualquer pasta do seu Google Drive.</p>
+                <p>O <strong>Organize Play</strong> vai ler todas as subpastas (transformando em Módulos), encontrar os vídeos (<code>.mp4</code>, <code>.mkv</code>, <code>.webm</code>) e emparelhar automaticamente os <code>.pdf</code> de apoio na mesma pasta!</p>
+            </div>
+
+            <form onsubmit="handleScanDriveFolder(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Nome do Curso (Opcional)</label>
+                    <input type="text" id="importDriveCourseName" placeholder="Deixe em branco para usar o nome da pasta do Drive" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Link da Pasta do Google Drive ou Folder ID</label>
+                    <input type="text" id="importDriveFolderUrl" required placeholder="Ex: https://drive.google.com/drive/folders/1a2b3c4d5e6f7g..." class="w-full px-3.5 py-2 rounded-xl text-xs font-mono">
+                </div>
+
+                <div id="driveScanStatusBox" class="hidden p-3 rounded-xl theme-accent-soft text-xs font-mono flex items-center gap-2">
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                    <span id="driveScanStatusText">Escaneando arquivos da pasta no Google Drive...</span>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalImportDriveFolder')" class="px-4 py-2 rounded-xl bg-play-card text-slate-300 text-xs font-semibold">Cancelar</button>
+                    <button type="submit" id="btnSubmitScanDrive" class="px-5 py-2 rounded-xl bg-play-accent hover:bg-play-accentHover text-white keep-white text-xs font-semibold flex items-center gap-1.5">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> Escanear & Montar Curso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CRIAR CURSO MANUAL -->
+    <div id="modalCreateCourse" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-play-surface border border-play-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-play-border pb-3">
+                <h3 class="text-base font-bold text-white">Novo Curso</h3>
+                <button onclick="closeModal('modalCreateCourse')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleCreateManualCourse(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Título do Curso / Disciplina</label>
+                    <input type="text" id="newCourseTitle" required placeholder="Ex: Direito Constitucional Completo - Pós-Edital" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Professor / Instituição</label>
+                    <input type="text" id="newCourseInstructor" placeholder="Ex: Prof. Adriane Fauth" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Categoria / Concurso Alvo</label>
+                    <input type="text" id="newCourseCategory" placeholder="Ex: Carreiras Policiais" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalCreateCourse')" class="px-4 py-2 rounded-xl bg-play-card text-slate-300 text-xs font-semibold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-play-accent text-white keep-white text-xs font-semibold">Criar Curso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADICIONAR / EDITAR AULA -->
+    <div id="modalAddLesson" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-play-surface border border-play-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-play-border pb-3">
+                <h3 class="text-base font-bold text-white" id="modalLessonHeaderTitle">Nova Videoaula</h3>
+                <button onclick="closeModal('modalAddLesson')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleSaveLesson(event)" class="space-y-3.5">
+                <input type="hidden" id="editLessonId" value="">
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Módulo / Bloco</label>
+                    <input type="text" id="lessonModuleInput" required placeholder="Ex: Módulo 01 - Direitos e Garantias Fundamentais" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Título da Aula</label>
+                    <input type="text" id="lessonTitleInput" required placeholder="Ex: Aula 01 - Artigo 5º e Remédios Constitucionais" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Link do Vídeo no Google Drive (ou ID do arquivo)</label>
+                    <input type="text" id="lessonVideoUrlInput" placeholder="Ex: https://drive.google.com/file/d/1xYz.../view" class="w-full px-3.5 py-2 rounded-xl text-xs font-mono">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Nome do PDF Anexo (Opcional)</label>
+                        <input type="text" id="lessonPdfNameInput" placeholder="Ex: Apostila Aula 01.pdf" class="w-full px-3.5 py-2 rounded-xl text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Link do PDF no Drive (Opcional)</label>
+                        <input type="text" id="lessonPdfUrlInput" placeholder="https://drive.google.com/file/d/..." class="w-full px-3.5 py-2 rounded-xl text-xs font-mono">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalAddLesson')" class="px-4 py-2 rounded-xl bg-play-card text-slate-300 text-xs font-semibold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-play-accent text-white keep-white text-xs font-semibold">Salvar Aula</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: ANEXAR PDF EXTRA À AULA ATUAL -->
+    <div id="modalAddPdfAttachment" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-play-surface border border-play-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-play-border pb-3">
+                <h3 class="text-base font-bold text-white">Anexar PDF à Aula</h3>
+                <button onclick="closeModal('modalAddPdfAttachment')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleAddPdfToCurrentLesson(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Título do Arquivo PDF</label>
+                    <input type="text" id="attachPdfTitle" required placeholder="Ex: Caderno de Questões Comentadas.pdf" class="w-full px-3.5 py-2 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Link do PDF no Google Drive (ou URL direta)</label>
+                    <input type="text" id="attachPdfUrl" required placeholder="https://drive.google.com/file/d/..." class="w-full px-3.5 py-2 rounded-xl text-xs font-mono">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalAddPdfAttachment')" class="px-4 py-2 rounded-xl bg-play-card text-slate-300 text-xs font-semibold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-play-accent text-white keep-white text-xs font-semibold">Anexar PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 5: CONFIGURAR CREDENCIAIS DO GOOGLE DRIVE -->
+    <div id="modalDriveConfig" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-play-surface border border-play-border rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-play-border pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="key" class="w-5 h-5 theme-accent-text"></i> Credenciais da API do Google Drive
+                </h3>
+                <button onclick="closeModal('modalDriveConfig')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+                Use o mesmo <strong>Client ID</strong> e <strong>API Key</strong> que você já configurou no seu projeto Organize. Ele permite ler suas pastas de aulas e reproduzir seus vídeos e PDFs privados do Google Drive.
+            </p>
+            <form onsubmit="saveDriveConfig(event)" class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">Client ID (OAuth 2.0)</label>
+                    <input type="text" id="driveClientIdInput" required placeholder="123456789-xxx.apps.googleusercontent.com" class="w-full px-3.5 py-2 rounded-xl text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase text-slate-400 mb-1">API Key</label>
+                    <input type="text" id="driveApiKeyInput" required placeholder="AIzaSy..." class="w-full px-3.5 py-2 rounded-xl text-xs font-mono">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalDriveConfig')" class="px-4 py-2 rounded-xl bg-play-card text-slate-300 text-xs font-semibold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-play-accent text-white keep-white text-xs font-semibold">Salvar Credenciais</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- =========================================================================
+         JAVASCRIPT DA PLATAFORMA DE CURSOS
+         ========================================================================= -->
+    <script>
+        const COURSES_STORAGE_KEY = 'ORGANIZE_PLAY_COURSES_V1';
+        const DRIVE_CREDS_KEY = 'ORGANIZE_GDRIVE_CREDS_V2'; // Compartilha a mesma chave do app Organize!
+        const THEME_KEY = 'ORGANIZE_THEME_KEY_V2';
+
+        let coursesState = [];
+        let activeCourseId = null;
+        let activeModuleId = null;
+        let activeLessonId = null;
+        let videoRenderMode = 'EMBED'; // 'EMBED' ou 'NATIVE'
+        let isPdfSplitOpen = false;
+
+        // Google Drive API State
+        let driveTokenClient = null;
+        let driveAccessToken = null;
+        let gapiReady = false;
+        let gisReady = false;
+
+        // Extrai o ID de um arquivo ou pasta de qualquer link do Google Drive
+        function extractDriveId(inputStr) {
+            if (!inputStr) return '';
+            const clean = inputStr.trim();
+            const folderMatch = clean.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+            if (folderMatch) return folderMatch[1];
+            const fileMatch = clean.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (fileMatch) return fileMatch[1];
+            const idParamMatch = clean.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (idParamMatch) return idParamMatch[1];
+            return clean;
+        }
+
+        function getDemoCourses() {
+            return [
+                {
+                    id: 'course-demo-1',
+                    title: 'Direito Constitucional Completo (Exemplo)',
+                    instructor: 'Plataforma Organize Play',
+                    category: 'Concursos Públicos',
+                    driveFolderId: '',
+                    modules: [
+                        {
+                            id: 'mod-1',
+                            title: 'Módulo 01 - Teoria Geral e Direitos Fundamentais',
+                            lessons: [
+                                {
+                                    id: 'les-101',
+                                    title: 'Aula 01 - Princípios Fundamentais (Arts. 1º ao 4º)',
+                                    videoDriveId: '',
+                                    videoUrl: '',
+                                    watched: true,
+                                    notes: 'Anotação de exemplo: Soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e livre iniciativa, pluralismo político (SO-CI-DI-VA-PLU).',
+                                    pdfs: [
+                                        { id: 'pdf-1', title: 'Apostila Teórica - Aula 01.pdf', driveId: '', url: '' },
+                                        { id: 'pdf-2', title: 'Lista de 50 Questões Comentadas.pdf', driveId: '', url: '' }
+                                    ]
+                                },
+                                {
+                                    id: 'les-102',
+                                    title: 'Aula 02 - Direitos e Deveres Individuais e Coletivos (Art. 5º)',
+                                    videoDriveId: '',
+                                    videoUrl: '',
+                                    watched: false,
+                                    notes: '',
+                                    pdfs: [
+                                        { id: 'pdf-3', title: 'Resumo Esquematizado Art. 5º.pdf', driveId: '', url: '' }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: 'mod-2',
+                            title: 'Módulo 02 - Organização do Estado e Poderes',
+                            lessons: [
+                                {
+                                    id: 'les-201',
+                                    title: 'Aula 01 - Repartição de Competências Constitucionais',
+                                    videoDriveId: '',
+                                    videoUrl: '',
+                                    watched: false,
+                                    notes: '',
+                                    pdfs: []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ];
+        }
+
+        function loadCoursesState() {
+            try {
+                const raw = localStorage.getItem(COURSES_STORAGE_KEY);
+                if (raw) {
+                    coursesState = JSON.parse(raw);
+                } else {
+                    coursesState = getDemoCourses();
+                    saveCoursesState();
+                }
+            } catch (e) {
+                coursesState = getDemoCourses();
+            }
+        }
+
+        function saveCoursesState() {
+            localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(coursesState));
+            updateCatalogKPIs();
+        }
+
+        function applyTheme(theme) {
+            localStorage.setItem(THEME_KEY, theme);
+            const root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            if (['dark', 'military', 'flamengo'].includes(theme)) {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+            const sel = document.getElementById('themeSelector');
+            if (sel) sel.value = theme;
+            lucide.createIcons();
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = 'pointer-events-auto flex items-center gap-3 p-3.5 rounded-2xl border border-play-border bg-play-surface shadow-2xl text-xs font-medium text-white transition-all';
+            el.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 theme-accent-text shrink-0"></i><span>${msg}</span>`;
+            container.appendChild(el);
+            lucide.createIcons();
+            setTimeout(() => {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 250);
+            }, 3200);
+        }
+
+        // =========================================================================
+        // CÁLCULO DE PROGRESSO E CATÁLOGO DE CURSOS
+        // =========================================================================
+        function calculateCourseStats(course) {
+            let totalLessons = 0;
+            let watchedLessons = 0;
+            let totalPdfs = 0;
+
+            (course.modules || []).forEach(mod => {
+                (mod.lessons || []).forEach(les => {
+                    totalLessons++;
+                    if (les.watched) watchedLessons++;
+                    totalPdfs += (les.pdfs || []).length;
+                });
+            });
+
+            const pct = totalLessons > 0 ? Math.round((watchedLessons / totalLessons) * 100) : 0;
+            return { totalLessons, watchedLessons, totalPdfs, pct };
+        }
+
+        function updateCatalogKPIs() {
+            let grandTotalLessons = 0;
+            let grandWatchedLessons = 0;
+
+            coursesState.forEach(c => {
+                const st = calculateCourseStats(c);
+                grandTotalLessons += st.totalLessons;
+                grandWatchedLessons += st.watchedLessons;
+            });
+
+            const globalPct = grandTotalLessons > 0 ? Math.round((grandWatchedLessons / grandTotalLessons) * 100) : 0;
+
+            const elCourses = document.getElementById('kpiTotalCourses');
+            const elLessons = document.getElementById('kpiCompletedLessons');
+            const elPct = document.getElementById('kpiGlobalPct');
+
+            if (elCourses) elCourses.textContent = coursesState.length;
+            if (elLessons) elLessons.textContent = `${grandWatchedLessons}/${grandTotalLessons}`;
+            if (elPct) elPct.textContent = `${globalPct}%`;
+        }
+
+        function renderCatalog() {
+            updateCatalogKPIs();
+            const search = (document.getElementById('catalogSearchInput')?.value || '').toLowerCase();
+            const grid = document.getElementById('coursesGridContainer');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = coursesState.filter(c => {
+                if (!search) return true;
+                const matchCourse = c.title.toLowerCase().includes(search) || (c.instructor || '').toLowerCase().includes(search) || (c.category || '').toLowerCase().includes(search);
+                const matchLesson = (c.modules || []).some(m => m.title.toLowerCase().includes(search) || (m.lessons || []).some(l => l.title.toLowerCase().includes(search)));
+                return matchCourse || matchLesson;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-play-surface border border-play-border rounded-2xl p-12 text-center space-y-3">
+                        <i data-lucide="folder-open" class="w-10 h-10 theme-accent-text mx-auto"></i>
+                        <h3 class="text-base font-bold text-white">Nenhum curso encontrado</h3>
+                        <p class="text-xs text-slate-400 max-w-md mx-auto">Clique em "Importar Pasta do Drive" no topo para carregar suas videoaulas e PDFs automaticamente ou crie um curso manual.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach(course => {
+                const stats = calculateCourseStats(course);
+                grid.innerHTML += `
+                    <div class="course-card bg-play-surface border border-play-border rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-sm">
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase theme-accent-soft font-bold">
+                                    ${course.category || 'Curso'}
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    ${course.driveFolderId ? `
+                                        <button onclick="resyncCourseFromDrive('${course.id}')" title="Atualizar arquivos da pasta do Google Drive" class="p-1.5 rounded-lg bg-play-card hover:bg-play-bg text-slate-300 hover:theme-accent-text transition">
+                                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    ` : ''}
+                                    <button onclick="deleteCourse('${course.id}')" title="Excluir Curso" class="p-1.5 rounded-lg bg-play-card hover:bg-play-bg text-slate-400 hover:text-rose-400 transition">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div onclick="openCoursePlayer('${course.id}')" class="cursor-pointer group">
+                                <h3 class="text-base font-extrabold text-white group-hover:theme-accent-text transition line-clamp-2">${course.title}</h3>
+                                <p class="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5 theme-accent-text"></i>
+                                    <span>${course.instructor || 'Estudo Direcionado'}</span>
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <div class="p-2.5 rounded-xl bg-play-bg border border-play-subtle flex items-center gap-2 text-xs">
+                                    <i data-lucide="video" class="w-4 h-4 theme-accent-text shrink-0"></i>
+                                    <span class="font-mono text-slate-300">${stats.watchedLessons}/${stats.totalLessons} aulas</span>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-play-bg border border-play-subtle flex items-center gap-2 text-xs">
+                                    <i data-lucide="file-text" class="w-4 h-4 theme-accent-text shrink-0"></i>
+                                    <span class="font-mono text-slate-300">${stats.totalPdfs} PDFs</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-2 border-t border-play-border">
+                            <div>
+                                <div class="flex items-center justify-between text-xs font-mono mb-1">
+                                    <span class="text-slate-400">Progresso Concluído</span>
+                                    <span class="theme-accent-text font-bold">${stats.pct}%</span>
+                                </div>
+                                <div class="w-full h-2 bg-play-bg rounded-full overflow-hidden p-0.5">
+                                    <div class="h-full rounded-full progress-shimmer transition-all duration-500" style="width: ${stats.pct}%"></div>
+                                </div>
+                            </div>
+
+                            <button onclick="openCoursePlayer('${course.id}')" class="w-full py-2.5 rounded-xl bg-play-accent hover:bg-play-accentHover text-white keep-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition">
+                                <i data-lucide="play" class="w-4 h-4"></i> Acessar Sala de Aula
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            lucide.createIcons();
+        }
+
+        function handleCreateManualCourse(e) {
+            e.preventDefault();
+            const title = document.getElementById('newCourseTitle').value.trim();
+            const instructor = document.getElementById('newCourseInstructor').value.trim();
+            const category = document.getElementById('newCourseCategory').value.trim();
+
+            if (!title) return;
+
+            const newCourse = {
+                id: 'course-' + Date.now(),
+                title,
+                instructor: instructor || 'Curso Personalizado',
+                category: category || 'Geral',
+                driveFolderId: '',
+                modules: [
+                    {
+                        id: 'mod-' + Date.now(),
+                        title: 'Módulo 01 - Aulas Iniciais',
+                        lessons: []
+                    }
+                ]
+            };
+
+            coursesState.unshift(newCourse);
+            saveCoursesState();
+            closeModal('modalCreateCourse');
+            e.target.reset();
+            renderCatalog();
+            showToast('Curso criado com sucesso!');
+        }
+
+        function deleteCourse(courseId) {
+            coursesState = coursesState.filter(c => c.id !== courseId);
+            saveCoursesState();
+            renderCatalog();
+            showToast('Curso removido.');
+        }
+
+        // =========================================================================
+        // SALA DE AULA (PLAYER, CHECK DE AULAS, PDFS E ANOTAÇÕES)
+        // =========================================================================
+        function showCatalogView() {
+            document.getElementById('viewPlayer').classList.add('hidden');
+            document.getElementById('viewCatalog').classList.remove('hidden');
+            document.getElementById('topCourseBreadcrumb').classList.add('hidden');
+            // Pausa vídeos ao sair
+            document.getElementById('lessonVideoIframe').src = '';
+            const nativeVid = document.getElementById('lessonVideoNative');
+            if (nativeVid) { nativeVid.pause(); nativeVid.src = ''; }
+            renderCatalog();
+        }
+
+        function getActiveCourse() {
+            return coursesState.find(c => c.id === activeCourseId);
+        }
+
+        function getActiveLessonObj() {
+            const course = getActiveCourse();
+            if (!course) return null;
+            for (const mod of course.modules) {
+                for (const les of mod.lessons) {
+                    if (les.id === activeLessonId) {
+                        return { course, mod, les };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function openCoursePlayer(courseId) {
+            activeCourseId = courseId;
+            const course = getActiveCourse();
+            if (!course) return;
+
+            document.getElementById('viewCatalog').classList.add('hidden');
+            document.getElementById('viewPlayer').classList.remove('hidden');
+            document.getElementById('topCourseBreadcrumb').classList.remove('hidden');
+            document.getElementById('breadcrumbCourseTitle').textContent = course.title;
+            document.getElementById('playlistCourseTitle').textContent = course.title;
+
+            // Seleciona a primeira aula não assistida, ou a primeira aula do curso
+            let firstLessonId = null;
+            for (const m of course.modules) {
+                for (const l of m.lessons) {
+                    if (!firstLessonId) firstLessonId = l.id;
+                    if (!l.watched) {
+                        firstLessonId = l.id;
+                        break;
+                    }
+                }
+                if (firstLessonId && course.modules.some(m2 => m2.lessons.some(l2 => l2.id === firstLessonId && !l2.watched))) break;
+            }
+
+            activeLessonId = firstLessonId;
+            renderCoursePlaylist();
+            loadActiveLessonIntoPlayer();
+        }
+
+        function selectLesson(lessonId) {
+            activeLessonId = lessonId;
+            renderCoursePlaylist();
+            loadActiveLessonIntoPlayer();
+        }
+
+        function renderCoursePlaylist() {
+            const course = getActiveCourse();
+            if (!course) return;
+
+            const stats = calculateCourseStats(course);
+            document.getElementById('playlistProgressCount').textContent = `${stats.watchedLessons}/${stats.totalLessons} aulas vistas`;
+            document.getElementById('playlistProgressPct').textContent = `${stats.pct}%`;
+            document.getElementById('playlistProgressBar').style.width = `${stats.pct}%`;
+
+            const container = document.getElementById('playlistModulesContainer');
+            container.innerHTML = '';
+
+            if (!course.modules || course.modules.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 font-mono">Nenhum módulo cadastrado.</div>`;
+                return;
+            }
+
+            course.modules.forEach((mod, mIdx) => {
+                const modTotal = mod.lessons.length;
+                const modWatched = mod.lessons.filter(l => l.watched).length;
+
+                let lessonsHTML = '';
+                mod.lessons.forEach((les, lIdx) => {
+                    const isSelected = les.id === activeLessonId;
+                    const pdfCount = (les.pdfs || []).length;
+
+                    lessonsHTML += `
+                        <div class="p-2.5 rounded-xl border transition flex items-start justify-between gap-2.5 ${isSelected ? 'bg-play-card border-play-accent shadow-sm' : 'bg-play-bg/70 border-play-subtle hover:border-play-border'}">
+                            <!-- Checkbox Rápido para dar Check na aula -->
+                            <button type="button" onclick="toggleLessonCheckById('${les.id}', event)" title="${les.watched ? 'Aula concluída (clique para desmarcar)' : 'Dar check como aula vista'}" class="mt-0.5 w-5 h-5 rounded-md flex items-center justify-center border transition shrink-0 ${les.watched ? 'theme-accent-bg border-transparent' : 'bg-play-surface border-slate-600 hover:border-play-accent'}">
+                                ${les.watched ? `<i data-lucide="check" class="w-3.5 h-3.5 text-white keep-white"></i>` : ''}
+                            </button>
+
+                            <!-- Título clicável para reproduzir -->
+                            <div onclick="selectLesson('${les.id}')" class="flex-1 min-w-0 cursor-pointer">
+                                <div class="text-xs font-semibold ${les.watched ? 'line-through text-slate-400' : 'text-white'} leading-snug">
+                                    ${les.title}
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    ${les.videoDriveId || les.videoUrl ? `
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-mono theme-accent-text">
+                                            <i data-lucide="play-circle" class="w-3 h-3"></i> Vídeo
+                                        </span>
+                                    ` : ''}
+                                    ${pdfCount > 0 ? `
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-mono text-slate-400">
+                                            <i data-lucide="file-text" class="w-3 h-3"></i> ${pdfCount} PDF${pdfCount > 1 ? 's' : ''}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Botões Editar / Excluir Aula -->
+                            <div class="flex items-center gap-0.5 shrink-0">
+                                <button onclick="openEditLessonModal('${les.id}')" title="Editar Aula" class="p-1 text-slate-400 hover:text-white">
+                                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="deleteLessonById('${les.id}')" title="Excluir Aula" class="p-1 text-slate-400 hover:text-rose-400">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-play-bg/50 border border-play-border rounded-2xl overflow-hidden">
+                        <div class="p-3 bg-play-card/50 border-b border-play-border flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold text-white truncate">${mod.title}</span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded theme-accent-soft font-bold shrink-0">${modWatched}/${modTotal}</span>
+                        </div>
+                        <div class="p-2 space-y-1.5">
+                            ${lessonsHTML || `<div class="p-3 text-center text-[11px] text-slate-400 font-mono">Sem aulas neste módulo</div>`}
+                        </div>
+                    </div>
+                `;
+            });
+
+            lucide.createIcons();
+        }
+
+        function loadActiveLessonIntoPlayer() {
+            const ctx = getActiveLessonObj();
+            const iframe = document.getElementById('lessonVideoIframe');
+            const nativeVideo = document.getElementById('lessonVideoNative');
+            const emptyState = document.getElementById('lessonVideoEmptyState');
+
+            if (!ctx) {
+                document.getElementById('playerModuleBadge').textContent = 'Curso';
+                document.getElementById('playerLessonTitle').textContent = 'Adicione ou selecione uma aula na lista ao lado';
+                iframe.src = '';
+                emptyState.classList.remove('hidden');
+                document.getElementById('lessonPdfAttachmentsList').innerHTML = '';
+                document.getElementById('lessonNotesTextarea').value = '';
+                return;
+            }
+
+            const { mod, les } = ctx;
+            document.getElementById('playerModuleBadge').textContent = mod.title;
+            document.getElementById('playerLessonTitle').textContent = les.title;
+            document.getElementById('lessonNotesTextarea').value = les.notes || '';
+
+            updateLessonWatchedUI(les.watched);
+            renderLessonVideoPlayer(les);
+            renderLessonPdfList(les);
+
+            // Se já tiver PDF na aula e o painel de PDF estiver aberto, carrega o primeiro PDF automaticamente
+            if (isPdfSplitOpen && les.pdfs && les.pdfs.length > 0) {
+                openPdfInViewer(les.pdfs[0].id);
+            }
+        }
+
+        function renderLessonVideoPlayer(les) {
+            const iframe = document.getElementById('lessonVideoIframe');
+            const nativeVideo = document.getElementById('lessonVideoNative');
+            const emptyState = document.getElementById('lessonVideoEmptyState');
+            const extLink = document.getElementById('externalVideoDriveLink');
+
+            const driveId = les.videoDriveId || extractDriveId(les.videoUrl);
+
+            if (!driveId && !les.videoUrl) {
+                iframe.src = '';
+                iframe.classList.add('hidden');
+                nativeVideo.pause();
+                nativeVideo.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                extLink.href = '#';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            extLink.href = driveId ? `https://drive.google.com/file/d/${driveId}/view` : les.videoUrl;
+
+            if (videoRenderMode === 'EMBED') {
+                nativeVideo.pause();
+                nativeVideo.classList.add('hidden');
+                iframe.classList.remove('hidden');
+                if (driveId) {
+                    iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
+                } else {
+                    iframe.src = les.videoUrl;
+                }
+            } else {
+                iframe.src = '';
+                iframe.classList.add('hidden');
+                nativeVideo.classList.remove('hidden');
+                if (driveId && driveAccessToken) {
+                    nativeVideo.src = `https://www.googleapis.com/drive/v3/files/${driveId}?alt=media&access_token=${encodeURIComponent(driveAccessToken)}`;
+                } else if (driveId) {
+                    nativeVideo.src = `https://drive.google.com/uc?export=download&id=${driveId}`;
+                } else {
+                    nativeVideo.src = les.videoUrl;
+                }
+            }
+        }
+
+        function switchVideoRenderMode(mode) {
+            videoRenderMode = mode;
+            const bEmbed = document.getElementById('btnVideoModeEmbed');
+            const bNative = document.getElementById('btnVideoModeNative');
+
+            if (mode === 'EMBED') {
+                bEmbed.className = 'px-2.5 py-1 rounded-lg text-[11px] font-mono theme-accent-bg';
+                bNative.className = 'px-2.5 py-1 rounded-lg text-[11px] font-mono bg-play-bg text-slate-300';
+            } else {
+                bNative.className = 'px-2.5 py-1 rounded-lg text-[11px] font-mono theme-accent-bg';
+                bEmbed.className = 'px-2.5 py-1 rounded-lg text-[11px] font-mono bg-play-bg text-slate-300';
+            }
+
+            const ctx = getActiveLessonObj();
+            if (ctx) renderLessonVideoPlayer(ctx.les);
+        }
+
+        function updateLessonWatchedUI(isWatched) {
+            const badge = document.getElementById('playerLessonStatusBadge');
+            const btn = document.getElementById('btnCheckLesson');
+
+            if (isWatched) {
+                badge.className = 'text-[10px] font-mono uppercase px-2 py-0.5 rounded theme-accent-soft font-bold';
+                badge.textContent = '✓ Aula Concluída';
+                btn.className = 'px-4 py-2 rounded-xl theme-accent-bg text-xs font-bold flex items-center gap-2 transition shadow-md';
+                btn.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i><span>Aula Vista (Concluída)</span>`;
+            } else {
+                badge.className = 'text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-play-card text-slate-400';
+                badge.textContent = 'Pendente';
+                btn.className = 'px-4 py-2 rounded-xl bg-play-card hover:bg-play-bg border border-play-border text-xs font-bold text-white flex items-center gap-2 transition';
+                btn.innerHTML = `<i data-lucide="circle" class="w-4 h-4"></i><span>Marcar como Vista</span>`;
+            }
+            lucide.createIcons();
+        }
+
+        function toggleCurrentLessonWatched() {
+            const ctx = getActiveLessonObj();
+            if (!ctx) return;
+            ctx.les.watched = !ctx.les.watched;
+            saveCoursesState();
+            updateLessonWatchedUI(ctx.les.watched);
+            renderCoursePlaylist();
+            showToast(ctx.les.watched ? 'Aula marcada como vista!' : 'Aula desmarcada.');
+        }
+
+        function toggleLessonCheckById(lessonId, ev) {
+            if (ev) ev.stopPropagation();
+            const course = getActiveCourse();
+            if (!course) return;
+            for (const mod of course.modules) {
+                for (const les of mod.lessons) {
+                    if (les.id === lessonId) {
+                        les.watched = !les.watched;
+                        saveCoursesState();
+                        renderCoursePlaylist();
+                        if (activeLessonId === lessonId) {
+                            updateLessonWatchedUI(les.watched);
+                        }
+                        showToast(les.watched ? 'Check registrado na aula!' : 'Check removido.');
+                        return;
+                    }
+                }
+            }
+        }
+
+        function playNextLesson() {
+            const course = getActiveCourse();
+            if (!course) return;
+            const flatLessons = [];
+            course.modules.forEach(m => m.lessons.forEach(l => flatLessons.push(l)));
+            const idx = flatLessons.findIndex(l => l.id === activeLessonId);
+            if (idx >= 0 && idx + 1 < flatLessons.length) {
+                selectLesson(flatLessons[idx + 1].id);
+            } else {
+                showToast('Você chegou à última aula deste curso!');
+            }
+        }
+
+        function saveCurrentLessonNotes(val) {
+            const ctx = getActiveLessonObj();
+            if (!ctx) return;
+            ctx.les.notes = val;
+            saveCoursesState();
+            const ind = document.getElementById('notesSavedIndicator');
+            if (ind) {
+                ind.textContent = 'Salvo agora ✓';
+                setTimeout(() => { ind.textContent = 'Salvo automaticamente'; }, 2000);
+            }
+        }
+
+        // =========================================================================
+        // REPRODUTOR / LEITOR DE ANEXOS PDF DA AULA
+        // =========================================================================
+        function renderLessonPdfList(les) {
+            const container = document.getElementById('lessonPdfAttachmentsList');
+            container.innerHTML = '';
+
+            const pdfs = les.pdfs || [];
+            if (pdfs.length === 0) {
+                container.innerHTML = `<div class="p-4 rounded-xl bg-play-bg border border-play-subtle text-center text-xs text-slate-400 font-mono">Nenhum PDF anexado a esta aula.</div>`;
+                return;
+            }
+
+            pdfs.forEach(pdf => {
+                const dId = pdf.driveId || extractDriveId(pdf.url);
+                const directViewUrl = dId ? `https://drive.google.com/file/d/${dId}/view` : (pdf.url || '#');
+
+                container.innerHTML += `
+                    <div class="p-3 rounded-xl bg-play-bg border border-play-border flex items-center justify-between gap-2 group hover:border-play-accent transition">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="p-2 rounded-lg theme-accent-soft shrink-0">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-bold text-white truncate">${pdf.title}</div>
+                                <div class="text-[10px] font-mono text-slate-400">Documento PDF</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="openPdfInViewer('${pdf.id}')" class="px-2.5 py-1.5 rounded-lg bg-play-accent text-white keep-white text-[11px] font-semibold flex items-center gap-1">
+                                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Ler PDF
+                            </button>
+                            <a href="${directViewUrl}" target="_blank" rel="noopener" title="Abrir ou Baixar do Drive" class="p-1.5 rounded-lg bg-play-card text-slate-300 hover:text-white">
+                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                            </a>
+                            <button onclick="deletePdfAttachment('${pdf.id}')" title="Remover Anexo" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function openPdfInViewer(pdfId) {
+            const ctx = getActiveLessonObj();
+            if (!ctx) return;
+            const pdf = (ctx.les.pdfs || []).find(p => p.id === pdfId);
+            if (!pdf) return;
+
+            const panel = document.getElementById('pdfViewerPanel');
+            const grid = document.getElementById('mediaWorkspaceGrid');
+            const iframe = document.getElementById('pdfPreviewIframe');
+            const titleEl = document.getElementById('activePdfTitle');
+            const extBtn = document.getElementById('activePdfExternalBtn');
+
+            isPdfSplitOpen = true;
+            panel.classList.remove('hidden');
+            grid.className = 'grid grid-cols-1 xl:grid-cols-2 gap-5';
+
+            titleEl.textContent = pdf.title;
+            const dId = pdf.driveId || extractDriveId(pdf.url);
+
+            if (dId) {
+                iframe.src = `https://drive.google.com/file/d/${dId}/preview`;
+                extBtn.href = `https://drive.google.com/file/d/${dId}/view`;
+            } else if (pdf.url) {
+                iframe.src = pdf.url;
+                extBtn.href = pdf.url;
+            } else {
+                showToast('Este PDF de demonstração não possui um ID do Google Drive vinculado. Cole um link do seu Drive!');
+            }
+        }
+
+        function closePdfViewer() {
+            isPdfSplitOpen = false;
+            document.getElementById('pdfViewerPanel').classList.add('hidden');
+            document.getElementById('mediaWorkspaceGrid').className = 'grid grid-cols-1 gap-5';
+            document.getElementById('pdfPreviewIframe').src = '';
+        }
+
+        function toggleSplitPdfView() {
+            if (isPdfSplitOpen) {
+                closePdfViewer();
+            } else {
+                const ctx = getActiveLessonObj();
+                if (ctx && ctx.les.pdfs && ctx.les.pdfs.length > 0) {
+                    openPdfInViewer(ctx.les.pdfs[0].id);
+                } else {
+                    openModal('modalAddPdfAttachment');
+                }
+            }
+        }
+
+        function handleAddPdfToCurrentLesson(e) {
+            e.preventDefault();
+            const ctx = getActiveLessonObj();
+            if (!ctx) return;
+
+            const title = document.getElementById('attachPdfTitle').value.trim();
+            const url = document.getElementById('attachPdfUrl').value.trim();
+            const driveId = extractDriveId(url);
+
+            if (!ctx.les.pdfs) ctx.les.pdfs = [];
+            const newPdf = {
+                id: 'pdf-' + Date.now(),
+                title,
+                driveId,
+                url
+            };
+            ctx.les.pdfs.push(newPdf);
+
+            saveCoursesState();
+            closeModal('modalAddPdfAttachment');
+            e.target.reset();
+            renderLessonPdfList(ctx.les);
+            renderCoursePlaylist();
+            openPdfInViewer(newPdf.id);
+            showToast('PDF anexado à aula!');
+        }
+
+        function deletePdfAttachment(pdfId) {
+            const ctx = getActiveLessonObj();
+            if (!ctx) return;
+            ctx.les.pdfs = (ctx.les.pdfs || []).filter(p => p.id !== pdfId);
+            saveCoursesState();
+            renderLessonPdfList(ctx.les);
+            renderCoursePlaylist();
+            showToast('PDF removido da aula.');
+        }
+
+        // =========================================================================
+        // ADICIONAR / EDITAR / EXCLUIR AULAS MANUALMENTE
+        // =========================================================================
+        function openEditLessonModal(lessonId) {
+            const course = getActiveCourse();
+            if (!course) return;
+
+            for (const mod of course.modules) {
+                const les = mod.lessons.find(l => l.id === lessonId);
+                if (les) {
+                    document.getElementById('modalLessonHeaderTitle').textContent = 'Editar Videoaula';
+                    document.getElementById('editLessonId').value = les.id;
+                    document.getElementById('lessonModuleInput').value = mod.title;
+                    document.getElementById('lessonTitleInput').value = les.title;
+                    document.getElementById('lessonVideoUrlInput').value = les.videoUrl || les.videoDriveId || '';
+                    const firstPdf = (les.pdfs && les.pdfs[0]) ? les.pdfs[0] : null;
+                    document.getElementById('lessonPdfNameInput').value = firstPdf ? firstPdf.title : '';
+                    document.getElementById('lessonPdfUrlInput').value = firstPdf ? (firstPdf.url || firstPdf.driveId || '') : '';
+                    openModal('modalAddLesson');
+                    return;
+                }
+            }
+        }
+
+        function handleSaveLesson(e) {
+            e.preventDefault();
+            const course = getActiveCourse();
+            if (!course) return;
+
+            const editId = document.getElementById('editLessonId').value;
+            const modTitle = document.getElementById('lessonModuleInput').value.trim();
+            const lesTitle = document.getElementById('lessonTitleInput').value.trim();
+            const videoRaw = document.getElementById('lessonVideoUrlInput').value.trim();
+            const pdfName = document.getElementById('lessonPdfNameInput').value.trim();
+            const pdfRaw = document.getElementById('lessonPdfUrlInput').value.trim();
+
+            const videoDriveId = extractDriveId(videoRaw);
+            const pdfDriveId = extractDriveId(pdfRaw);
+
+            let targetMod = course.modules.find(m => m.title.toLowerCase() === modTitle.toLowerCase());
+            if (!targetMod) {
+                targetMod = { id: 'mod-' + Date.now(), title: modTitle, lessons: [] };
+                course.modules.push(targetMod);
+            }
+
+            if (editId) {
+                // Remove da posição antiga se mudou de módulo e atualiza
+                let existingLesson = null;
+                course.modules.forEach(m => {
+                    const found = m.lessons.find(l => l.id === editId);
+                    if (found) {
+                        existingLesson = found;
+                        if (m.id !== targetMod.id) {
+                            m.lessons = m.lessons.filter(l => l.id !== editId);
+                            targetMod.lessons.push(existingLesson);
+                        }
+                    }
+                });
+                if (existingLesson) {
+                    existingLesson.title = lesTitle;
+                    existingLesson.videoDriveId = videoDriveId;
+                    existingLesson.videoUrl = videoRaw;
+                    if (pdfRaw) {
+                        existingLesson.pdfs = [{
+                            id: 'pdf-' + Date.now(),
+                            title: pdfName || `${lesTitle}.pdf`,
+                            driveId: pdfDriveId,
+                            url: pdfRaw
+                        }];
+                    }
+                }
+                showToast('Aula atualizada!');
+            } else {
+                const newLesson = {
+                    id: 'les-' + Date.now(),
+                    title: lesTitle,
+                    videoDriveId,
+                    videoUrl: videoRaw,
+                    watched: false,
+                    notes: '',
+                    pdfs: pdfRaw ? [{
+                        id: 'pdf-' + Date.now(),
+                        title: pdfName || `${lesTitle}.pdf`,
+                        driveId: pdfDriveId,
+                        url: pdfRaw
+                    }] : []
+                };
+                targetMod.lessons.push(newLesson);
+                activeLessonId = newLesson.id;
+                showToast('Nova aula adicionada!');
+            }
+
+            document.getElementById('editLessonId').value = '';
+            saveCoursesState();
+            closeModal('modalAddLesson');
+            e.target.reset();
+            renderCoursePlaylist();
+            loadActiveLessonIntoPlayer();
+        }
+
+        function deleteLessonById(lessonId) {
+            const course = getActiveCourse();
+            if (!course) return;
+            course.modules.forEach(m => {
+                m.lessons = m.lessons.filter(l => l.id !== lessonId);
+            });
+            saveCoursesState();
+            if (activeLessonId === lessonId) {
+                activeLessonId = course.modules[0]?.lessons[0]?.id || null;
+                loadActiveLessonIntoPlayer();
+            }
+            renderCoursePlaylist();
+            showToast('Aula excluída.');
+        }
+
+        // =========================================================================
+        // INTEGRAÇÃO COM GOOGLE DRIVE (LEITURA DE PASTAS DE CURSOS, VÍDEOS E PDFS)
+        // =========================================================================
+        function getDriveCreds() {
+            try {
+                const raw = localStorage.getItem(DRIVE_CREDS_KEY);
+                return raw ? JSON.parse(raw) : { clientId: '', apiKey: '' };
+            } catch (e) {
+                return { clientId: '', apiKey: '' };
+            }
+        }
+
+        function saveDriveConfig(e) {
+            e.preventDefault();
+            const clientId = document.getElementById('driveClientIdInput').value.trim();
+            const apiKey = document.getElementById('driveApiKeyInput').value.trim();
+            localStorage.setItem(DRIVE_CREDS_KEY, JSON.stringify({ clientId, apiKey }));
+            gapiReady = false;
+            gisReady = false;
+            closeModal('modalDriveConfig');
+            initDriveAPI();
+            showToast('Credenciais do Google Drive salvas!');
+        }
+
+        function initDriveAPI() {
+            const creds = getDriveCreds();
+            if (!creds.clientId || !creds.apiKey) return;
+
+            if (typeof gapi !== 'undefined' && !gapiReady) {
+                gapi.load('client', async () => {
+                    try {
+                        await gapi.client.init({
+                            apiKey: creds.apiKey,
+                            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+                        });
+                        gapiReady = true;
+                    } catch (err) {
+                        console.error('Erro GAPI:', err);
+                    }
+                });
+            }
+
+            if (typeof google !== 'undefined' && google.accounts && !gisReady) {
+                try {
+                    // Escopo drive.readonly permite listar as pastas de cursos, vídeos e PDFs do seu Drive
+                    driveTokenClient = google.accounts.oauth2.initTokenClient({
+                        client_id: creds.clientId,
+                        scope: 'https://www.googleapis.com/auth/drive.readonly',
+                        callback: (resp) => {
+                            if (resp.error !== undefined) {
+                                showToast('Erro ao autenticar com o Google Drive.');
+                                return;
+                            }
+                            driveAccessToken = resp.access_token;
+                            document.getElementById('driveStatusBadge').textContent = 'Drive Conectado';
+                            document.getElementById('btnDriveConnect').textContent = 'Desconectar';
+                            showToast('Google Drive conectado! Agora você pode importar qualquer pasta de aulas.');
+                        }
+                    });
+                    gisReady = true;
+                } catch (err) {
+                    console.error('Erro GIS:', err);
+                }
+            }
+        }
+
+        function handleDriveAuth() {
+            if (driveAccessToken) {
+                driveAccessToken = null;
+                document.getElementById('driveStatusBadge').textContent = 'Drive Desconectado';
+                document.getElementById('btnDriveConnect').textContent = 'Conectar Drive';
+                showToast('Desconectado do Google Drive.');
+                return;
+            }
+
+            const creds = getDriveCreds();
+            if (!creds.clientId || !creds.apiKey) {
+                openModal('modalDriveConfig');
+                return;
+            }
+
+            initDriveAPI();
+            if (driveTokenClient) {
+                driveTokenClient.requestAccessToken({ prompt: 'consent' });
+            } else {
+                showToast('Inicializando Google Drive... Clique novamente em 2 segundos.');
+            }
+        }
+
+        async function fetchDriveFilesInFolder(folderId) {
+            const query = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
+            const fields = encodeURIComponent('files(id, name, mimeType, webViewLink)');
+            const url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=${fields}&orderBy=name&pageSize=1000`;
+
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${driveAccessToken}` }
+            });
+            if (!res.ok) throw new Error('Falha ao ler pasta do Drive');
+            const data = await res.json();
+            return data.files || [];
+        }
+
+        async function fetchDriveFolderMetadata(folderId) {
+            const url = `https://www.googleapis.com/drive/v3/files/${folderId}?fields=id,name`;
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${driveAccessToken}` }
+            });
+            if (!res.ok) return { id: folderId, name: 'Curso do Google Drive' };
+            return await res.json();
+        }
+
+        function buildLessonsFromDriveItems(items) {
+            const videos = items.filter(f => f.mimeType.startsWith('video/') || /\.(mp4|mkv|webm|mov|avi)$/i.test(f.name));
+            const pdfs = items.filter(f => f.mimeType === 'application/pdf' || /\.pdf$/i.test(f.name));
+
+            const lessons = [];
+            const usedPdfIds = new Set();
+
+            videos.forEach((vid, idx) => {
+                const baseName = vid.name.replace(/\.[^/.]+$/, '');
+                // Procura PDFs com nome parecido ou na mesma pasta
+                const matchingPdfs = pdfs.filter(p => {
+                    const pdfBase = p.name.replace(/\.[^/.]+$/, '');
+                    return pdfBase.toLowerCase().includes(baseName.toLowerCase().slice(0, 8)) || baseName.toLowerCase().includes(pdfBase.toLowerCase().slice(0, 8));
+                });
+
+                const lessonPdfs = matchingPdfs.map(p => {
+                    usedPdfIds.add(p.id);
+                    return { id: 'pdf-' + p.id, title: p.name, driveId: p.id, url: p.webViewLink || '' };
+                });
+
+                lessons.push({
+                    id: 'les-' + vid.id,
+                    title: baseName,
+                    videoDriveId: vid.id,
+                    videoUrl: vid.webViewLink || '',
+                    watched: false,
+                    notes: '',
+                    pdfs: lessonPdfs
+                });
+            });
+
+            // Se sobraram PDFs na pasta que não tinham o mesmo nome do vídeo:
+            const remainingPdfs = pdfs.filter(p => !usedPdfIds.has(p.id));
+            if (remainingPdfs.length > 0) {
+                if (lessons.length > 0) {
+                    // Anexa na primeira aula do módulo para fácil acesso
+                    remainingPdfs.forEach(p => {
+                        lessons[0].pdfs.push({
+                            id: 'pdf-' + p.id,
+                            title: p.name,
+                            driveId: p.id,
+                            url: p.webViewLink || ''
+                        });
+                    });
+                } else {
+                    // Módulo somente de PDFs / Apostilas
+                    remainingPdfs.forEach(p => {
+                        lessons.push({
+                            id: 'les-' + p.id,
+                            title: p.name.replace(/\.[^/.]+$/, ''),
+                            videoDriveId: '',
+                            videoUrl: '',
+                            watched: false,
+                            notes: '',
+                            pdfs: [{ id: 'pdf-' + p.id, title: p.name, driveId: p.id, url: p.webViewLink || '' }]
+                        });
+                    });
+                }
+            }
+
+            return lessons;
+        }
+
+        async function handleScanDriveFolder(e) {
+            e.preventDefault();
+            if (!driveAccessToken) {
+                showToast('Conecte sua conta do Google Drive primeiro!');
+                handleDriveAuth();
+                return;
+            }
+
+            const customTitle = document.getElementById('importDriveCourseName').value.trim();
+            const rawFolderUrl = document.getElementById('importDriveFolderUrl').value.trim();
+            const folderId = extractDriveId(rawFolderUrl);
+
+            if (!folderId) {
+                showToast('Link ou ID da pasta inválido.');
+                return;
+            }
+
+            const statusBox = document.getElementById('driveScanStatusBox');
+            const statusTxt = document.getElementById('driveScanStatusText');
+            const submitBtn = document.getElementById('btnSubmitScanDrive');
+
+            statusBox.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            try {
+                statusTxt.textContent = 'Buscando informações da pasta principal...';
+                const folderMeta = await fetchDriveFolderMetadata(folderId);
+                const topItems = await fetchDriveFilesInFolder(folderId);
+
+                const subfolders = topItems.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+                const rootFiles = topItems.filter(f => f.mimeType !== 'application/vnd.google-apps.folder');
+
+                const modules = [];
+
+                // Se houver arquivos soltos na raiz da pasta
+                const rootLessons = buildLessonsFromDriveItems(rootFiles);
+                if (rootLessons.length > 0) {
+                    modules.push({
+                        id: 'mod-root-' + Date.now(),
+                        title: 'Módulo Principal',
+                        lessons: rootLessons
+                    });
+                }
+
+                // Varre cada subpasta como um Módulo do curso
+                for (let i = 0; i < subfolders.length; i++) {
+                    const sub = subfolders[i];
+                    statusTxt.textContent = `Lendo módulo (${i + 1}/${subfolders.length}): ${sub.name}...`;
+                    const subItems = await fetchDriveFilesInFolder(sub.id);
+                    const subLessons = buildLessonsFromDriveItems(subItems);
+                    if (subLessons.length > 0) {
+                        modules.push({
+                            id: 'mod-' + sub.id,
+                            title: sub.name,
+                            lessons: subLessons
+                        });
+                    }
+                }
+
+                if (modules.length === 0) {
+                    showToast('Nenhum vídeo ou PDF encontrado dentro desta pasta do Drive.');
+                } else {
+                    const newCourse = {
+                        id: 'course-drive-' + Date.now(),
+                        title: customTitle || folderMeta.name || 'Curso Importado do Drive',
+                        instructor: 'Google Drive Sync',
+                        category: 'Drive Cloud',
+                        driveFolderId: folderId,
+                        modules
+                    };
+
+                    coursesState.unshift(newCourse);
+                    saveCoursesState();
+                    closeModal('modalImportDriveFolder');
+                    e.target.reset();
+                    renderCatalog();
+                    showToast(`Curso "${newCourse.title}" importado com ${modules.length} módulo(s)!`);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Erro ao acessar a pasta. Verifique se o seu Drive está conectado.');
+            } finally {
+                statusBox.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        }
+
+        async function resyncCourseFromDrive(courseId) {
+            const course = coursesState.find(c => c.id === courseId);
+            if (!course || !course.driveFolderId) return;
+            if (!driveAccessToken) {
+                showToast('Conecte o Google Drive no topo para sincronizar novos arquivos.');
+                handleDriveAuth();
+                return;
+            }
+            document.getElementById('importDriveCourseName').value = course.title;
+            document.getElementById('importDriveFolderUrl').value = course.driveFolderId;
+            openModal('modalImportDriveFolder');
+        }
+
+        // =========================================================================
+        // EXPORTAR / IMPORTAR BACKUP E CONTROLE DE MODAIS
+        // =========================================================================
+        function exportCoursesBackup() {
+            const blob = new Blob([JSON.stringify(coursesState, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `organize_play_cursos_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 200);
+            showToast('Backup dos cursos exportado!');
+        }
+
+        function importCoursesBackup(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        coursesState = parsed;
+                        saveCoursesState();
+                        renderCatalog();
+                        showToast('Cursos importados com sucesso!');
+                    }
+                } catch (err) {
+                    showToast('Arquivo JSON inválido.');
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (!m) return;
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            if (id === 'modalDriveConfig') {
+                const creds = getDriveCreds();
+                document.getElementById('driveClientIdInput').value = creds.clientId || '';
+                document.getElementById('driveApiKeyInput').value = creds.apiKey || '';
+            }
+            if (id === 'modalAddLesson' && !document.getElementById('editLessonId').value) {
+                document.getElementById('modalLessonHeaderTitle').textContent = 'Nova Videoaula';
+            }
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (!m) return;
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            if (id === 'modalAddLesson') {
+                document.getElementById('editLessonId').value = '';
+            }
+        }
+
+        window.onload = () => {
+            applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+            loadCoursesState();
+            renderCatalog();
+            lucide.createIcons();
+            setTimeout(initDriveAPI, 800);
+        };
+    </script>
+</body>
+</html>
